@@ -19,15 +19,18 @@ export default function ColorBox({ color, index, onCopy }) {
   }
 
   return (
-    <div className="flex-1 min-h-screen relative">
+    <div 
+      className="flex-1 relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}>
       <div
-        onClick={() => setOpen(!open)}
-        className="w-full h-full flex items-end p-6 cursor-pointer select-none transition-transform duration-300 hover:scale-[1.03]"
+        
+        className="relative w-full h-full flex items-end p-6 select-none transition-transform duration-300"
         style={{ background: css }}
       >
-        <div className="bg-white/70 backdrop-blur-sm px-3 py-2 rounded">
-          <div className="text-xs font-semibold">{hex}</div>
-          <div className="text-[10px] text-gray-600">{hslText}</div>
+        <div className="flex z-10 bg-white/70 backdrop-blur-sm px-3 py-2 rounded justify-center ">
+          <div className="text-[30px] font-sans">{hex}</div>
+          {/* <div className="text-[30px] text-gray-600">{hslText}</div> */}
         </div>
       </div>
 
@@ -37,13 +40,13 @@ export default function ColorBox({ color, index, onCopy }) {
           <div className="flex gap-2 mb-2">
             <button
               onClick={() => handleCopy(hex)}
-              className="px-2 py-1 rounded bg-indigo-600 text-white text-xs transition hover:bg-indigo-500"
+              className="px-2 py-1 rounded bg-indigo-600 text-white text-xs transition hover:bg-indigo-500 cursor-pointer"
             >
               Copy HEX
             </button>
             <button
               onClick={() => handleCopy(rgb)}
-              className="px-2 py-1 rounded bg-gray-800 text-white text-xs transition hover:bg-gray-700"
+              className="px-2 py-1 rounded bg-gray-800 text-white text-xs transition hover:bg-gray-700 cursor-pointer"
             >
               Copy RGB
             </button>
@@ -51,7 +54,7 @@ export default function ColorBox({ color, index, onCopy }) {
           <div>
             <button
               onClick={() => handleCopy(hslText)}
-              className="px-2 py-1 rounded border text-xs transition hover:bg-gray-50"
+              className="px-2 py-1 rounded border text-xs transition hover:bg-gray-50 cursor-pointer"
             >
               Copy HSL
             </button>
