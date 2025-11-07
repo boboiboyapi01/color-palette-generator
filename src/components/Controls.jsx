@@ -12,7 +12,7 @@ export default function Controls({ count, setCount, onGenerate}) {
   return (
     <div className="h-[50px] flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <label className="text-m font-bold text-gray-600">Colors to Generate:</label>
+        <label className="text-m font-bold text-gray-700">Colors to Generate:</label>
         <input
           type="range"
           min="2"
