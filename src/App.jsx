@@ -14,12 +14,21 @@ export default function App() {
     return generatePalette(5);
   });
   const [toast, setToast] = useState("");
+  const [locked, setLocked] = useState(Array(count).fill(false));
+
+  function toggleLock(idx) {
+    setLocked((prev) => {
+      const next = [...prev];
+      next[idx] = !next[idx];
+      return next;
+    });
+  }
 
   function handleGenerate() {
-    const p = generatePalette(count);
-    setPalette(p);
-    // save last palette automatically
-    localStorage.setItem("last-palette", JSON.stringify(p));
+    setPalette((prev) =>
+      prev.map((c, i) => (locked[i] ? c : generatePalette(1)[0]))
+    );
+    localStorage.setItem("last-palette", JSON.stringify(palette));
   }
 
   function handleSave() {
@@ -67,7 +76,14 @@ export default function App() {
 
       <div className="flex-1 flex overflow-hidden">
         {palette.map((c, i) => (
-          <ColorBox key={i} color={c} index={i} onCopy={showCopied} />
+          <ColorBox
+            key={i}
+            color={c}
+            index={i}
+            onCopy={showCopied}
+            locked={locked[i]}
+            onToggleLock={() => toggleLock(i)}
+          />
         ))}
       </div>
 
