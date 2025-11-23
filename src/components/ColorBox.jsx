@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { hslToCss, hslToHex, hslToRgb } from "../utils/colorUtils";
 
-export default function ColorBox({ color, index, onCopy, locked, onToggleLock }) {
+export default function ColorBox({ color, index, onCopy, locked, onToggleLock, onSelect }) {
   const [open, setOpen] = useState(false);
 
   const css = hslToCss(color);
@@ -25,7 +25,7 @@ export default function ColorBox({ color, index, onCopy, locked, onToggleLock })
       onMouseLeave={() => setOpen(false)}
     >
       <div
-        className="relative w-full h-full flex p-6 select-none transition-transform duration-300 justify-start"
+        className="relative w-full cursor-pointer h-full flex p-6 select-none transition-transform duration-300 justify-start"
         style={{ background: css }}
         onClick={() => onSelect(hex)}
       >

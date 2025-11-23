@@ -1,5 +1,6 @@
 import { randomColor, getColorName, hslToHex } from "../utils/colorUtils";
 import ColorBox from "./ColorBox";
+import ColorDetail from "./ColorDetail";
 import { useState, useEffect } from "react";
 
 export default function MainComponent() {
