@@ -1,14 +1,7 @@
 export default function Navbar() {
   return (
-    <header className="h-[70px] w-full bg-white/70 backdrop-blur-sm shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-5 py-5 flex items-start justify-between ">
-        <div className="text-lg font-bold tracking-tight text-gray-800 ">
-          Color Palette Generator
-        </div>
-        <div className="text-lg text-black">
-          By BoboiboyApi01
-        </div>
-      </div>
-    </header>
+    <nav className="w-full bg-blue-600 text-white px-5 py-6">
+      <h1 className="text-2xl font-semibold pl-3">Color Palette Generator</h1>
+    </nav>
   );
 }
