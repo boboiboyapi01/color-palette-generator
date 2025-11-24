@@ -10,32 +10,6 @@ export function hslToCss({ h, s, l }) {
   return `hsl(${h} ${s}% ${l}%)`;
 }
 
-export function hslToRgb({ h, s, l }) {
-  s /= 100;
-  l /= 100;
-  const k = (n) => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = (n) => {
-    const color =
-      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-    return Math.round(255 * color);
-  };
-  return `rgb(${f(0)}, ${f(8)}, ${f(4)})`;
-}
-
-export function hslToHex(hsl) {
-  const { h, s, l } = hsl;
-  const rgb = hslToRgb({ h, s, l });
-  const nums = rgb.match(/\d+/g).map(Number);
-  return (
-    "#" +
-    nums
-      .map((n) => n.toString(16).padStart(2, "0"))
-      .join("")
-      .toUpperCase()
-  );
-}
-
 export function getColorName(hex) {
   try {
     const names = namer(hex);
@@ -50,6 +24,81 @@ export function getColorName(hex) {
   }
 }
 
+export function hexToRgb(hex) {
+  const h = hex.replace("#", "");
+  const bigint = parseInt(h, 16);
+  if (h.length === 3) {
+    // short hex like #f0a
+    const r = parseInt(h[0] + h[0], 16);
+    const g = parseInt(h[1] + h[1], 16);
+    const b = parseInt(h[2] + h[2], 16);
+    return { r, g, b };
+  } else {
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return { r, g, b };
+  }
+}
+
+export function rgbToHex({ r, g, b }) {
+  const toHex = (n) => n.toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+}
+
+export function rgbToHsl({ r, g, b }) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h *= 60;
+  }
+  return { h: Math.round(h), s: +(s*100).toFixed(1), l: +(l*100).toFixed(1) }; // h:0-360, s/l in %
+}
+
+export function hslToRgb({ h, s, l }) {
+  s /= 100; l /= 100;
+  const c = (1 - Math.abs(2*l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c/2;
+  let r = 0, g = 0, b = 0;
+  if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+  else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+  else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+  else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+  else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255)
+  };
+}
+
+export function hslToHex(hsl) {
+  return rgbToHex(hslToRgb(hsl));
+}
+
+export function shiftHue(h, deg) {
+  let nh = (h + deg) % 360;
+  if (nh < 0) nh += 360;
+  return Math.round(nh);
+}
+
+export function clamp(v, min=0, max=100) {
+  return Math.max(min, Math.min(max, v));
+}
+
 export function randomColor() {
   const h = Math.floor(Math.random() * 360); // 0 - 359
   // Saturation 45-85% supaya warna tidak terlalu gray
@@ -62,92 +111,14 @@ export function randomColor() {
 
 /* Generators */
 
-export function generatePalette(mode = "random", count = 5) {
+export function generatePalette( count = 5) {
   const baseHue = randomInt(0, 359);
   const s = randomInt(50, 90);
   const l = randomInt(40, 80);
 
-  switch (mode) {
-    /* MONOKROMATIK */
-    case "monochromatic":
-      return Array.from({ length: count }).map((_, i) => ({
-        h: baseHue, // Hue tetap sama
-        s: Math.max(20, Math.min(100, s - i * 5)), // Saturation turun perlahan
-        l: Math.max(15, Math.min(85, l + (i - Math.floor(count / 2)) * 15)), // Lightness variasi
-      }));
-
-    /* ANALOGUS */
-    case "analogous":
-      return Array.from({ length: count }).map((_, i) => ({
-        h: (baseHue + i * 25) % 360,
-        s: randomInt(55, 90),
-        l: randomInt(35, 65),
-      }));
-
-    /* KOMPLEMENTER */
-    case "complementary":
-      return [
-        { h: baseHue, s, l },
-        { h: (baseHue + 180) % 360, s, l },
-        { h: (baseHue + 20) % 360, s, l },
-        { h: (baseHue + 200) % 360, s, l },
-        { h: (baseHue + 160) % 360, s, l },
-      ];
-
-    /* SPLIT KOMPLEMENTER */
-    case "split-complementary":
-      return [
-        { h: baseHue, s, l },
-        { h: (baseHue + 150) % 360, s, l },
-        { h: (baseHue + 210) % 360, s, l },
-        { h: (baseHue + 30) % 360, s, l },
-        { h: (baseHue + 330) % 360, s, l },
-      ];
-
-    /* TRIADIK */
-    case "triadic":
-      return [
-        { h: baseHue, s, l },
-        { h: (baseHue + 120) % 360, s, l },
-        { h: (baseHue + 240) % 360, s, l },
-        { h: (baseHue + 60) % 360, s, l },
-        { h: (baseHue + 300) % 360, s, l },
-      ];
-
-    /* TETRADIK */
-    case "tetradic":
-      return [
-        { h: baseHue, s, l },
-        { h: (baseHue + 90) % 360, s, l },
-        { h: (baseHue + 180) % 360, s, l },
-        { h: (baseHue + 270) % 360, s, l },
-        { h: (baseHue + 45) % 360, s, l },
-      ];
-
-    /* SQUARE */
-    case "square":
-      return [
-        { h: baseHue, s, l },
-        { h: (baseHue + 90) % 360, s, l },
-        { h: (baseHue + 180) % 360, s, l },
-        { h: (baseHue + 270) % 360, s, l },
-        { h: (baseHue + 315) % 360, s, l },
-      ];
-
-    /* AKROMATIK */
-    case "achromatic":
-      return Array.from({ length: count }).map(() => ({
-        h: 0,
-        s: 0,
-        l: randomInt(10, 90),
-      }));
-
-    /* DEFAULT RANDOM */
-    default:
-      return Array.from({ length: count }).map(() => ({
+  return Array.from({ length: count }).map(() => ({
         h: randomInt(0, 359),
         s: randomInt(40, 100),
         l: randomInt(30, 80),
       }));
-  }
 }

@@ -32,7 +32,7 @@ export default function MainComponent() {
   return (
     <div className="min-h-screen w-full rounded-2xl mt-6 flex bg-white">
       {/* Generator Section */}
-      <div className="w-4/7 aspect-video p-6 mx-10 mt-15 border-r border-gray-300">
+      <div className="w-4/7 aspect-video p-6 lg:w-3/7 lg:ml-40 mx-10 mt-15 border-r border-gray-300">
         <div className="flex justify-between border rounded-t-xl items-center ">
           <h2 className="ml-4">Generator</h2>
           <div>
@@ -67,8 +67,7 @@ export default function MainComponent() {
         </div>
       </div>
       {/* Details Section */}
-      <div className="mt-15">
-        <h2 className="text-4xl">Details</h2>
+      <div className="mt-10">
         {selectedHex ? (
           <ColorDetail hex={selectedHex} />
         ) : (
