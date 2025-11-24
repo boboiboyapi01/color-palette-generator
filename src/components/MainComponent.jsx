@@ -71,7 +71,7 @@ export default function MainComponent() {
         {selectedHex ? (
           <ColorDetail hex={selectedHex} />
         ) : (
-          <div className="text-gray-500">
+          <div className="text-gray-500 text-xl mt-10 ml-8 transition duration-200">
             Klik warna untuk melihat detail
           </div>
         )}
