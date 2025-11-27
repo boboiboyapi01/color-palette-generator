@@ -42,14 +42,16 @@ function generateHarmonies(hex) {
 
 export default function ColorDetails({ hex }) {
   const harmonies = useMemo(() => generateHarmonies(hex), [hex]);
-  const complementary = harmonies.filter(h => h.label === "Complementary");
-  const analogous = harmonies.filter(h => h.label.startsWith("Analogous"));
-  const triadic = harmonies.filter(h => h.label.startsWith("Triadic"));
-  const splitComp = harmonies.filter(h => h.label.startsWith("Split-Comp"));
-  const tetradic = harmonies.filter(h => h.label.startsWith("Tetradic"));
-  const square = harmonies.filter(h => h.label.startsWith("Square"));
-  const monochromatic = harmonies.filter(h => h.label.startsWith("Mono"));
-  const shadeTint = harmonies.filter(h => h.label === "Shade -" || h.label === "Tint +");
+  const complementary = harmonies.filter((h) => h.label === "Complementary");
+  const analogous = harmonies.filter((h) => h.label.startsWith("Analogous"));
+  const triadic = harmonies.filter((h) => h.label.startsWith("Triadic"));
+  const splitComp = harmonies.filter((h) => h.label.startsWith("Split-Comp"));
+  const tetradic = harmonies.filter((h) => h.label.startsWith("Tetradic"));
+  const square = harmonies.filter((h) => h.label.startsWith("Square"));
+  const monochromatic = harmonies.filter((h) => h.label.startsWith("Mono"));
+  const shadeTint = harmonies.filter(
+    (h) => h.label === "Shade -" || h.label === "Tint +"
+  );
 
   return (
     <div className="p-4 mr-10 lg:mr-0 border rounded-lg shadow-md bg-white">
@@ -70,73 +72,146 @@ export default function ColorDetails({ hex }) {
           </div>
         </div>
 
-        <div>
+        <div className="p-6 max-w-4xl mx-auto ">
           <h3 className="text-2xl font-semibold py-2">Harmony</h3>
-          <div className="my-3 space-y-2">
-            <h4>Complementary</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: complementary[0].hex}}></div>
+
+          {/* Complementary */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Complementary</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: complementary[0].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Analogous</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: analogous[0].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: analogous[1].hex}}></div>
+
+          {/* Analogous */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Analogous</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div
+                className="flex-1"
+                style={{ background: analogous[0].hex }}
+              ></div>
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: analogous[1].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Triadic</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: triadic[0].hex}}></div>
-              <div className="w-12 h-12 rounded flex justify-center items-center" style={{background: hex}}><p className="text-xl text-white"></p></div>
-              <div className="w-12 h-12 rounded" style={{background: triadic[1].hex}}></div>
+
+          {/* Triadic */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Triadic</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div
+                className="flex-1"
+                style={{ background: triadic[0].hex }}
+              ></div>
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: triadic[1].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Split-Complementary</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: splitComp[0].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: splitComp[1].hex}}></div>
+
+          {/* Split-Complementary */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Split-Complementary</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: splitComp[0].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: splitComp[1].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Tetradic</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: tetradic[0].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: tetradic[1].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: tetradic[2].hex}}></div>
+
+          {/* Tetradic */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Tetradic</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: tetradic[0].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: tetradic[1].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: tetradic[2].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Square</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: square[0].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: square[1].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: square[2].hex}}></div>
+
+          {/* Square */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Square</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: square[0].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: square[1].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: square[2].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Monochromatic</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: monochromatic[0].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: monochromatic[1].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: monochromatic[2].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: monochromatic[3].hex}}></div>
+
+          {/* Monochromatic */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Monochromatic</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div
+                className="flex-1"
+                style={{ background: monochromatic[0].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: monochromatic[1].hex }}
+              ></div>
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: monochromatic[2].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: monochromatic[3].hex }}
+              ></div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <h4>Shade & Tint</h4>
-            <div className="flex gap-2">
-              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: shadeTint[0].hex}}></div>
-              <div className="w-12 h-12 rounded" style={{background: shadeTint[1].hex}}></div>
+
+          {/* Shade & Tint */}
+          <div className="my-3 space-y-2 bg-gray-50 p-4 rounded">
+            <h4 className="font-medium">Shade & Tint</h4>
+            <div className="flex gap-0 h-20 rounded overflow-hidden">
+              <div className="flex-1" style={{ background: hex }}></div>
+              <div
+                className="flex-1"
+                style={{ background: shadeTint[0].hex }}
+              ></div>
+              <div
+                className="flex-1"
+                style={{ background: shadeTint[1].hex }}
+              ></div>
             </div>
           </div>
         </div>
