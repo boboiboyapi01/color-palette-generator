@@ -28,10 +28,11 @@ function generateHarmonies(hex) {
   pushHsl(shiftHue(base.h, 120), base.s, base.l, "Triadic +120");
   pushHsl(shiftHue(base.h, -150), base.s, base.l, "Split-Comp -150");
   pushHsl(shiftHue(base.h, 150), base.s, base.l, "Split-Comp +150");
-  pushHsl(shiftHue(base.h, 90), base.s, base.l, "Tetradic +90");
-  pushHsl(shiftHue(base.h, 180), base.s, base.l, "Tetradic +180");
-  pushHsl(shiftHue(base.h, 270), base.s, base.l, "Tetradic +270");
+  pushHsl(shiftHue(base.h, 180), base.s, base.l, "Tetradic complementer A");
+  pushHsl(shiftHue(base.h, 60), base.s, base.l, "Tetradic C, A offset 60");
+  pushHsl(shiftHue(base.h, 240), base.s, base.l, "Tetradic complementer C");
   pushHsl(shiftHue(base.h, 90), base.s, base.l, "Square +90");
+  pushHsl(shiftHue(base.h, 180), base.s, base.l, "Square +180");
   pushHsl(shiftHue(base.h, 270), base.s, base.l, "Square +270");
   [20, 40, 60, 80].forEach((L) => pushHsl(base.h, base.s, L, `Mono L=${L}%`));
   pushHsl(base.h, clamp(base.s * 0.9), clamp(base.l * 0.6), "Shade -");
@@ -41,10 +42,18 @@ function generateHarmonies(hex) {
 
 export default function ColorDetails({ hex }) {
   const harmonies = useMemo(() => generateHarmonies(hex), [hex]);
+  const complementary = harmonies.filter(h => h.label === "Complementary");
+  const analogous = harmonies.filter(h => h.label.startsWith("Analogous"));
+  const triadic = harmonies.filter(h => h.label.startsWith("Triadic"));
+  const splitComp = harmonies.filter(h => h.label.startsWith("Split-Comp"));
+  const tetradic = harmonies.filter(h => h.label.startsWith("Tetradic"));
+  const square = harmonies.filter(h => h.label.startsWith("Square"));
+  const monochromatic = harmonies.filter(h => h.label.startsWith("Mono"));
+  const shadeTint = harmonies.filter(h => h.label === "Shade -" || h.label === "Tint +");
 
   return (
     <div className="p-4 mr-10 lg:mr-0 border rounded-lg shadow-md bg-white">
-      <h3 className="text-2xl font-semibold mb-3">Color Details</h3>
+      <h2 className="text-2xl font-semibold mb-3">Color Details</h2>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2 p-3 rounded bg-gray-50">
@@ -61,24 +70,76 @@ export default function ColorDetails({ hex }) {
           </div>
         </div>
 
-        {harmonies.map((h, i) => (
-          <div key={i} className="flex items-center gap-3 p-2 rounded border">
-            <div
-              className="w-12 h-12 rounded"
-              style={{ background: h.hex }}
-              title={`${h.label} — ${h.hex}`}
-            />
-            <div>
-              <div className="text-sm font-medium">{h.label}</div>
-              <div className="text-xs text-gray-600">{h.hex}</div>
-              {typeof getColorName === "function" && (
-                <div className="text-xs text-gray-500">
-                  {getColorName ? getColorName(h.hex) : null}
-                </div>
-              )}
+        <div>
+          <h3 className="text-2xl font-semibold py-2">Harmony</h3>
+          <div className="my-3 space-y-2">
+            <h4>Complementary</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: complementary[0].hex}}></div>
             </div>
           </div>
-        ))}
+          <div className="my-3 space-y-2">
+            <h4>Analogous</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: analogous[0].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: analogous[1].hex}}></div>
+            </div>
+          </div>
+          <div className="my-3 space-y-2">
+            <h4>Triadic</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: triadic[0].hex}}></div>
+              <div className="w-12 h-12 rounded flex justify-center items-center" style={{background: hex}}><p className="text-xl text-white"></p></div>
+              <div className="w-12 h-12 rounded" style={{background: triadic[1].hex}}></div>
+            </div>
+          </div>
+          <div className="my-3 space-y-2">
+            <h4>Split-Complementary</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: splitComp[0].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: splitComp[1].hex}}></div>
+            </div>
+          </div>
+          <div className="my-3 space-y-2">
+            <h4>Tetradic</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: tetradic[0].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: tetradic[1].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: tetradic[2].hex}}></div>
+            </div>
+          </div>
+          <div className="my-3 space-y-2">
+            <h4>Square</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: square[0].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: square[1].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: square[2].hex}}></div>
+            </div>
+          </div>
+          <div className="my-3 space-y-2">
+            <h4>Monochromatic</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: monochromatic[0].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: monochromatic[1].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: monochromatic[2].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: monochromatic[3].hex}}></div>
+            </div>
+          </div>
+          <div className="my-3 space-y-2">
+            <h4>Shade & Tint</h4>
+            <div className="flex gap-2">
+              <div className="w-12 h-12 rounded" style={{background: hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: shadeTint[0].hex}}></div>
+              <div className="w-12 h-12 rounded" style={{background: shadeTint[1].hex}}></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
