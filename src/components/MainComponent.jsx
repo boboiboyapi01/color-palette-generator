@@ -1,82 +1,176 @@
 import { randomColor, getColorName, hslToHex } from "../utils/colorUtils";
 import ColorBox from "./ColorBox";
 import ColorDetail from "./ColorDetail";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+
+// Toast Component
+function Toast({ message }) {
+  return (
+    <div className={`copy-toast ${message ? "show" : ""}`} aria-live="polite">
+      {message && <>✓ {message}</>}
+    </div>
+  );
+}
 
 export default function MainComponent() {
   const [count, setCount] = useState(5);
   const [colors, setColors] = useState([]);
   const [locked, setLocked] = useState([]);
   const [selectedHex, setSelectedHex] = useState(null);
+  const [toast, setToast] = useState("");
+  const [spinning, setSpinning] = useState(false);
+  const toastTimer = useRef(null);
 
-  const generateColors = (n) => {
-    const arr = Array.from({ length: n }, (_, i) =>
-      locked[i] ? colors[i] : randomColor()
-    );
-    setColors(arr);
-  };
+  const generateColors = useCallback(
+    (n, currentLocked = locked, currentColors = colors) => {
+      const arr = Array.from({ length: n }, (_, i) =>
+        currentLocked[i] ? currentColors[i] : randomColor(),
+      );
+      setColors(arr);
+    },
+    [locked, colors],
+  );
 
   useEffect(() => {
-    setLocked(Array(count).fill(false)); 
-    generateColors(count);
+    const newLocked = Array(count).fill(false);
+    setLocked(newLocked);
+    const arr = Array.from({ length: count }, () => randomColor());
+    setColors(arr);
+    setSelectedHex(null);
   }, [count]);
 
   function handleToggleLock(index) {
     setLocked((prev) => prev.map((lk, i) => (i === index ? !lk : lk)));
   }
 
-  function handleCopy(msg) {
-    alert(msg); // atau tampilkan toast
+  function handleGenerate() {
+    setSpinning(true);
+    generateColors(count);
+    setTimeout(() => setSpinning(false), 500);
+  }
+
+  function showToast(msg) {
+    setToast(msg);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), 2200);
   }
 
   return (
-    <div className="min-h-screen w-full rounded-2xl mt-6 flex bg-white">
-      {/* Generator Section */}
-      <div className="w-4/7 aspect-video p-6 lg:w-3/7 lg:ml-40 mx-10 mt-15 border-r border-gray-300">
-        <div className="flex justify-between border rounded-t-xl items-center ">
-          <h2 className="ml-4 font-semibold text-2xl">Generator</h2>
-          <div>
+    <div className="max-w-7xl mx-auto animate-fade-slide">
+      {/* ── Header Row ──────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-[var(--text)]">
+            Your Palette
+          </h2>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">
+            Click a color to explore harmonies · Hover to copy values
+          </p>
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center gap-5 glass px-5 py-3 rounded-2xl">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest">
+              Colors
+            </span>
+            <span className="text-lg font-bold gradient-text w-5 text-center">
+              {count}
+            </span>
             <input
               type="range"
               min="1"
               max="5"
               value={count}
               onChange={(e) => setCount(Number(e.target.value))}
+              className="w-24"
+              aria-label="Number of colors"
             />
-            <button
-              onClick={() => generateColors(count)}
-              className="relative overflow-hidden w-17 h-10 m-4 p-2 bg-blue-400 cursor-pointer rounded-full group"
+          </div>
+
+          <div className="w-px h-6 bg-white/10 rounded-full" />
+
+          {/* Generate button */}
+          <button
+            onClick={handleGenerate}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white cursor-pointer
+              bg-gradient-to-r from-violet-600 to-cyan-500
+              shadow-[0_0_20px_rgba(124,106,255,0.4)]
+              hover:shadow-[0_0_28px_rgba(124,106,255,0.65)]
+              hover:scale-105 active:scale-95
+              transition-all duration-200"
+            id="generate-btn"
+          >
+            <span className={`btn-spin ${spinning ? "spinning" : ""}`}>↻</span>
+            Generate
+          </button>
+        </div>
+      </div>
+
+      {/* ── Two-column layout ────────────────────────────── */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Palette Card */}
+        <div className="glass-strong rounded-2xl overflow-hidden max-h-80 shadow-2xl shadow-black/40 lg:flex-2">
+          <div
+            className="flex"
+            style={{ minHeight: "320px" }}
+          >
+            {colors.map((color, index) => (
+              <ColorBox
+                key={index}
+                color={color}
+                index={index}
+                locked={locked[index]}
+                onToggleLock={() => handleToggleLock(index)}
+                onCopy={showToast}
+                onSelect={(hex) => setSelectedHex(hex)}
+              />
+            ))}
+          </div>
+
+          {/* Hex codes row */}
+          <div className="flex border-t border-white/10">
+            {colors.map((color, i) => {
+              const hex = hslToHex(color);
+              return (
+                <div
+                  key={i}
+                  className="flex-1 text-center py-2 text-[11px] font-mono text-[var(--text-muted)] truncate px-1
+                    border-r border-white/5 last:border-r-0 hover:text-[var(--text)] transition-colors"
+                >
+                  {hex.toUpperCase()}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Detail Panel */}
+        <div className="lg:flex-[1.4] min-w-0">
+          {selectedHex ? (
+            <ColorDetail hex={selectedHex} />
+          ) : (
+            <div
+              className="glass rounded-2xl flex flex-col items-center justify-center text-center p-10 gap-4 h-full"
+              style={{ minHeight: "200px" }}
             >
-              <span className="absolute inset-0 bg-white opacity-70 blur-sm rotate-45 -translate-x-full group-hover:translate-x-full transition-transform duration-100"></span>
-              <span className="relative z-5">Go!</span>
-            </button>
-          </div>
-        </div>
-        <div className="border-b border-l border-r rounded-b-xl overflow-hidden">
-          {/* Generator content goes here */}
-          {colors.map((color, index) => (
-            <ColorBox
-              key={index}
-              color={color}
-              index={index}
-              locked={locked[index]}
-              onToggleLock={() => handleToggleLock(index)}
-              onCopy={handleCopy}
-              onSelect={(hex) => setSelectedHex(hex)}
-            />
-          ))}
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/30 to-cyan-500/30 flex items-center justify-center text-3xl">
+                🎨
+              </div>
+              <div>
+                <p className="font-semibold text-[var(--text)]">
+                  Select a Color
+                </p>
+                <p className="text-sm text-[var(--text-muted)] mt-1">
+                  Click any color swatch to see its harmony schemes and details
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      {/* Details Section */}
-      <div className="mt-10">
-        {selectedHex ? (
-          <ColorDetail hex={selectedHex} />
-        ) : (
-          <div className="text-gray-500 text-xl mt-10 ml-8 transition duration-200">
-            Klik warna untuk melihat detail
-          </div>
-        )}
-      </div>
+
+      <Toast message={toast} />
     </div>
   );
 }
